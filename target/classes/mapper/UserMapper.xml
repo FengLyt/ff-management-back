@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.springboot.mapper.UserMapper">
+    <resultMap id="userByMap" type="com.cheng.springboot.pojo.User">
+        <id column="id" property="id"/>
+        <result column="account" property="account"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="operatime" property="operatime"/>
+        <association property="user" javaType="com.cheng.springboot.pojo.User">
+            <result column="upoaccount" property="account"/>
+        </association>
+        <association property="dept" javaType="com.cheng.springboot.pojo.Dept">
+            <result column="deptid" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <collection property="roles" javaType="list" ofType="com.cheng.springboot.pojo.Role" select="findRolesById" column="id"> </collection>
+    </resultMap>
+    <select id="allUser" resultMap="userByMap">
+        SELECT u.`id`, u.`account`, u.`gender`, u.`phone`, d.`name`,u.operatime,upo.account upoaccount FROM USER u LEFT JOIN dept d ON u.`deptid` = d.`id` left join user upo on u.uid = upo.id WHERE u.`type` = 1
+<!--        <if test="account != ''"> and u.account like concat('%','${account}','%') </if>-->
+    </select>
+    <select id="findRolesById" resultType="com.cheng.springboot.pojo.Role"> SELECT r.id ,r.name  FROM user_role ur LEFT JOIN role r ON ur.`roleid` = r.`id` WHERE ur.`userid` = #{id} </select>
+    <select id="getUserAsAccount" resultMap="userByMap">
+        SELECT u.`id`, u.`account`, u.`gender`, u.`phone`, d.`name`,u.operatime,upo.account upoaccount FROM USER u LEFT JOIN dept d ON u.`deptid` = d.`id` left join user upo on u.uid = upo.id WHERE u.`type` = 1
+        <if test="account != ''"> and u.account like concat('%','${account}','%') </if>
+    </select>
+    <select id="getUserById" resultMap="userByMap">
+        SELECT u.`id`, u.`account`, u.`gender`, u.`phone`,u.`deptid`, ur.`roleid`,d.name FROM USER u LEFT JOIN user_role ur ON u.`id` = ur.`userid` LEFT JOIN dept d ON u.`deptid` = d.`id` WHERE u.`id` = #{id}
+    </select>
+
+<!--    <insert id="addUser" parameterType="User">-->
+<!--        insert into user(accou)-->
+<!--    </insert>-->
+</mapper>
